@@ -1,26 +1,171 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #ffffff;
+  --bg-sidebar: #fcfcfc;
+  --text-primary: #000000;
+  --text-secondary: #4b5563;
+  --accent-color: #000000;
+  --border-color: #f1f1f1;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f3f4f6; /* Gray-100 for main area */
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    flex-direction: row;
+  }
+}
+
+.sidebar {
+  width: 100%;
+  height: auto;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 1px 0 10px rgba(0,0,0,0.02);
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 24rem;
+    height: 100%;
+  }
+}
+
+.main-content {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #f3f4f6;
+}
+
+/* Poster Preview */
+.poster-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 42rem;
+  aspect-ratio: 1 / 1.414;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: zoom-in 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-viewport {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  border-radius: 2px;
+  border: 1px solid #eeeeee;
+}
+
+/* Text & Utilities */
+.text-white { color: #ffffff; }
+.text-black { color: #000000; }
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #64748b; }
+.text-slate-900 { color: #0f172a; }
+
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xl { font-size: 1.25rem; }
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-wider { letter-spacing: 0.05em; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.text-center { text-align: center; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mt-auto { margin-top: auto; }
+
+/* Inputs */
+input {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #000000;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #000000;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+/* Font Utilities */
+.font-anton { font-family: var(--font-anton), sans-serif; }
+.font-playfair { font-family: var(--font-playfair), serif; }
+.font-montserrat { font-family: var(--font-montserrat), sans-serif; }
+.font-oswald { font-family: var(--font-oswald), sans-serif; }
+.font-poppins { font-family: var(--font-poppins), sans-serif; }
+
+@keyframes zoom-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }

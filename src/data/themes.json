@@ -1,0 +1,107 @@
+[
+  {
+    "id": "minimalist",
+    "name": "Minimalist",
+    "map": {
+      "land": "#ffffff",
+      "water": "#f3f4f6",
+      "waterway": "#f3f4f6",
+      "parks": "#f9fafb",
+      "buildings": "#ffffff",
+      "roads": {
+        "major": "#000000",
+        "minor": "#9ca3af",
+        "path": "#d1d5db"
+      }
+    },
+    "ui": {
+      "background": "#ffffff",
+      "text": "#000000",
+      "accent": "#000000"
+    }
+  },
+  {
+    "id": "midnight",
+    "name": "Midnight",
+    "map": {
+      "land": "#1a1a2e",
+      "water": "#16213e",
+      "waterway": "#16213e",
+      "parks": "#1e2a3a",
+      "buildings": "#2a2a4a",
+      "roads": {
+        "major": "#e8d5b7",
+        "minor": "#4a4a6a",
+        "path": "#2e2e4e"
+      }
+    },
+    "ui": {
+      "background": "#1a1a2e",
+      "text": "#f0e6d3",
+      "accent": "#e8d5b7"
+    }
+  },
+  {
+    "id": "parchment",
+    "name": "Parchment",
+    "map": {
+      "land": "#f4f1ea",
+      "water": "#a0c4ff",
+      "waterway": "#a0c4ff",
+      "parks": "#d8e2dc",
+      "buildings": "#e9ecef",
+      "roads": {
+        "major": "#495057",
+        "minor": "#adb5bd",
+        "path": "#dee2e6"
+      }
+    },
+    "ui": {
+      "background": "#ffffff",
+      "text": "#212529",
+      "accent": "#495057"
+    }
+  },
+  {
+    "id": "emerald",
+    "name": "Emerald Coast",
+    "map": {
+      "land": "#f0fdf4",
+      "water": "#0ea5e9",
+      "waterway": "#0ea5e9",
+      "parks": "#bbf7d0",
+      "buildings": "#f1f5f9",
+      "roads": {
+        "major": "#1e293b",
+        "minor": "#94a3b8",
+        "path": "#cbd5e1"
+      }
+    },
+    "ui": {
+      "background": "#ffffff",
+      "text": "#0f172a",
+      "accent": "#10b981"
+    }
+  },
+  {
+    "id": "obsidian",
+    "name": "Obsidian",
+    "map": {
+      "land": "#0f172a",
+      "water": "#020617",
+      "waterway": "#020617",
+      "parks": "#1e293b",
+      "buildings": "#334155",
+      "roads": {
+        "major": "#ffffff",
+        "minor": "#64748b",
+        "path": "#475569"
+      }
+    },
+    "ui": {
+      "background": "#020617",
+      "text": "#f8fafc",
+      "accent": "#ffffff"
+    }
+  }
+]

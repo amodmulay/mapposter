@@ -1,0 +1,32 @@
+[
+  {
+    "id": "classic",
+    "name": "Classic",
+    "description": "Standard label below the map with a clean border",
+    "styles": {
+      "padding": "40px",
+      "borderWidth": "2px",
+      "labelPosition": "bottom"
+    }
+  },
+  {
+    "id": "minimal",
+    "name": "Minimal",
+    "description": "Edgeless layout for a modern look",
+    "styles": {
+      "padding": "0px",
+      "borderWidth": "0px",
+      "labelPosition": "overlay"
+    }
+  },
+  {
+    "id": "framed",
+    "name": "Framed",
+    "description": "Elegant thick frame around the map",
+    "styles": {
+      "padding": "60px",
+      "borderWidth": "12px",
+      "labelPosition": "bottom"
+    }
+  }
+]
