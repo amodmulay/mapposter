@@ -1,9 +1,30 @@
 [
   {
+    "id": "coral",
+    "name": "Coral",
+    "map": {
+      "land": "#F3E1DA",
+      "water": "#DFC0B5",
+      "waterway": "##DFC0B5",
+      "parks": "#EACFC6",
+      "buildings": "#E39B89",
+      "roads": {
+        "major": "#B9473A",
+        "minor": "#C86050",
+        "path": "#E8C4B8"
+      }
+    },
+    "ui": {
+      "background": "#F3E1DA",
+      "text": "#6E2F28",
+      "accent": "#B9473A"
+    }
+  },
+  {
     "id": "minimalist",
     "name": "Minimalist",
     "map": {
-      "land": "#ffffff",
+      "land": "#fffff9",
       "water": "#f3f4f6",
       "waterway": "#f3f4f6",
       "parks": "#f9fafb",
