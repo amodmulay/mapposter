@@ -20,6 +20,8 @@ export interface ExportOptions {
   underline?: boolean;
   fontFamily?: string;
   letterSpacing?: number;
+  titleSize?: number;
+  subtitleSize?: number;
 }
 
 /**
@@ -135,7 +137,8 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
     pinColor = '#ef4444', pinIcon = 'pin',
     titleColor = '#0f172a', subtitleColor = '#64748b', coordsColor = '#94a3b8',
     italic = false, underline = false,
-    fontFamily = 'serif', letterSpacing = 0
+    fontFamily = 'serif', letterSpacing = 0,
+    titleSize = 48, subtitleSize = 20
   } = options;
   console.log(`[Export] Starting ${format} export for: ${title} (${targetWidth}x${targetHeight}, padding: ${padding})`);
   
@@ -147,9 +150,10 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   const labelAreaHeight = contentHeight * 0.25;
   const mapWidth = contentWidth;
   const mapHeight = contentHeight * 0.75;
-
+  
   const baseWidth = 1200;
   const baseHeight = Math.round(baseWidth * (mapHeight / mapWidth));
+  const pixelRatio = mapWidth / baseWidth;
   
   const container = document.createElement('div');
   
@@ -159,8 +163,6 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   container.style.left = '-9999px';
   container.style.top = '0';
   document.body.appendChild(container);
-
-  const pixelRatio = mapWidth / baseWidth;
 
   const offscreenMap = new maplibregl.Map({
     container,
@@ -228,16 +230,16 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   }
 
   // Title (drawn slightly above center)
-  const titleSize = Math.round(48 * scale);
+  const finalTitleSize = Math.round(titleSize * scale);
   ctx.fillStyle = titleColor;
-  ctx.font = `${fontStyle}bold ${titleSize}px "${fontName}"`;
-  fillTextStyled(ctx, title.toUpperCase(), centerX, labelSectionCenterY - (Math.round(45 * scale)), underline, titleSize);
+  ctx.font = `${fontStyle}bold ${finalTitleSize}px "${fontName}"`;
+  fillTextStyled(ctx, title.toUpperCase(), centerX, labelSectionCenterY - (Math.round(45 * scale)), underline, finalTitleSize);
 
   // Subtitle (drawn slightly below center)
-  const subtitleSize = Math.round(20 * scale);
+  const finalSubtitleSize = Math.round(subtitleSize * scale);
   ctx.fillStyle = subtitleColor;
-  ctx.font = `${fontStyle}${subtitleSize}px "${fontName}"`;
-  fillTextStyled(ctx, subtitle.toUpperCase(), centerX, labelSectionCenterY + (Math.round(15 * scale)), underline, subtitleSize);
+  ctx.font = `${fontStyle}${finalSubtitleSize}px "${fontName}"`;
+  fillTextStyled(ctx, subtitle.toUpperCase(), centerX, labelSectionCenterY + (Math.round(15 * scale)), underline, finalSubtitleSize);
 
   // Coordinates (drawn below subtitle)
   const coordsSize = Math.round(12 * scale);

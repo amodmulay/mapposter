@@ -27,7 +27,9 @@ export default function Home() {
     italic: false,
     underline: false,
     fontFamily: 'serif',
-    letterSpacing: 2
+    letterSpacing: 2,
+    titleSize: 48,
+    subtitleSize: 20
   });
   const [resolution, setResolution] = useState('a4');
   const [padding, setPadding] = useState('none');
@@ -114,7 +116,9 @@ export default function Home() {
         italic: labels.italic,
         underline: labels.underline,
         fontFamily: labels.fontFamily,
-        letterSpacing: labels.letterSpacing
+        letterSpacing: labels.letterSpacing,
+        titleSize: labels.titleSize,
+        subtitleSize: labels.subtitleSize
       });
     } catch (error) {
       console.error('Export failed:', error);
@@ -186,12 +190,24 @@ export default function Home() {
             }}
           >
             <div className="map-viewport" style={{ flex: 3, marginBottom: 0 }}>
-               <Map center={center} zoom={zoom} theme={theme} showPin={labels.showPin} pinColor={pinColor} pinIcon={pinIcon} onMapLoad={(m) => mapRef.current = m} />
+               <Map 
+                 center={center} 
+                 zoom={zoom} 
+                 theme={theme} 
+                 showPin={labels.showPin} 
+                 pinColor={pinColor} 
+                 pinIcon={pinIcon} 
+                 onMapLoad={(m) => mapRef.current = m} 
+                 onCameraChange={(c, z) => {
+                   setCenter(c);
+                   setZoom(z);
+                 }}
+               />
             </div>
             
             <div className="text-center" style={{ fontFamily: 'serif', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h1 style={{ fontSize: `${48 * exportScale}px`, fontWeight: 'bold', marginBottom: `${10 * exportScale}px`, color: labels.titleColor, ...textStyle, transform: `translateY(${-45 * exportScale}px)` }}>{labels.title}</h1>
-              <p style={{ fontSize: `${20 * exportScale}px`, color: labels.subtitleColor, marginBottom: `${10 * exportScale}px`, ...textStyle, transform: `translateY(${15 * exportScale}px)` }}>{labels.subtitle}</p>
+              <h1 style={{ fontSize: `${labels.titleSize * exportScale}px`, fontWeight: 'bold', marginBottom: `${10 * exportScale}px`, color: labels.titleColor, ...textStyle, transform: `translateY(${-labels.titleSize * 0.9 * exportScale}px)` }}>{labels.title}</h1>
+              <p style={{ fontSize: `${labels.subtitleSize * exportScale}px`, color: labels.subtitleColor, marginBottom: `${10 * exportScale}px`, ...textStyle, transform: `translateY(${15 * exportScale}px)` }}>{labels.subtitle}</p>
               {labels.showCoordinates && (
                 <p style={{ fontSize: `${12 * exportScale}px`, fontFamily: 'monospace', color: labels.coordsColor, ...textStyle, transform: `translateY(${60 * exportScale}px)` }}>
                   {center[1].toFixed(4)}° N / {center[0].toFixed(4)}° E

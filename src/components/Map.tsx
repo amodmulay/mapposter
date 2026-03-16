@@ -13,6 +13,7 @@ interface MapProps {
   pinColor?: string;
   pinIcon?: 'pin' | 'heart' | 'home';
   onMapLoad?: (map: maplibregl.Map) => void;
+  onCameraChange?: (center: [number, number], zoom: number) => void;
 }
 
 function createMarkerElement(icon: string, color: string): HTMLDivElement {
@@ -44,7 +45,7 @@ function createMarkerElement(icon: string, color: string): HTMLDivElement {
   return el;
 }
 
-export default function Map({ center, zoom, theme, showPin = true, pinColor = '#ef4444', pinIcon = 'pin', onMapLoad }: MapProps) {
+export default function Map({ center, zoom, theme, showPin = true, pinColor = '#ef4444', pinIcon = 'pin', onMapLoad, onCameraChange }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
@@ -58,6 +59,8 @@ export default function Map({ center, zoom, theme, showPin = true, pinColor = '#
       center: center,
       zoom: zoom,
       attributionControl: false,
+      // Use pixelRatio 1 for consistent WYSIWYG across different devices
+      pixelRatio: 1,
       // @ts-ignore
       preserveDrawingBuffer: true
     });
@@ -73,15 +76,38 @@ export default function Map({ center, zoom, theme, showPin = true, pinColor = '#
       }
     });
 
+    const handleCameraChange = () => {
+      if (!map.current) return;
+      const c = map.current.getCenter();
+      onCameraChange?.([c.lng, c.lat], map.current.getZoom());
+    };
+
+    map.current.on('moveend', handleCameraChange);
+    map.current.on('zoomend', handleCameraChange);
+
+    // Watch for container resizing (e.g. resolution change)
+    const resizeObserver = new ResizeObserver(() => {
+      map.current?.resize();
+    });
+    resizeObserver.observe(mapContainer.current);
+
     return () => {
+      resizeObserver.disconnect();
       map.current?.remove();
     };
   }, []);
 
   useEffect(() => {
     if (!map.current) return;
-    map.current.setCenter(center);
-    map.current.setZoom(zoom);
+    const currentCenter = map.current.getCenter();
+    const currentZoom = map.current.getZoom();
+    
+    // Only jump if there's a significant difference to avoid infinite loops if onCameraChange is called
+    if (Math.abs(currentCenter.lng - center[0]) > 0.00001 || 
+        Math.abs(currentCenter.lat - center[1]) > 0.00001 ||
+        Math.abs(currentZoom - zoom) > 0.01) {
+      map.current.jumpTo({ center: center, zoom: zoom });
+    }
     
     if (markerRef.current) {
       markerRef.current.setLngLat(center);
@@ -119,9 +145,9 @@ export default function Map({ center, zoom, theme, showPin = true, pinColor = '#
         width: '100%', 
         height: '100%', 
         overflow: 'hidden', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-        border: '1px solid rgba(255, 255, 255, 0.1)'
+        borderRadius: '2px', 
+        boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+        border: '1px solid rgba(0, 0, 0, 0.05)'
       }}
     >
       <div ref={mapContainer} style={{ position: 'absolute', inset: 0 }} />
@@ -130,12 +156,12 @@ export default function Map({ center, zoom, theme, showPin = true, pinColor = '#
           position: 'absolute', 
           bottom: '1rem', 
           right: '1rem', 
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-          backdropFilter: 'blur(12px)', 
-          padding: '0.25rem 0.5rem', 
-          borderRadius: '4px', 
-          fontSize: '10px', 
-          color: 'rgba(255, 255, 255, 0.7)' 
+          backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+          backdropFilter: 'blur(4px)', 
+          padding: '0.2rem 0.4rem', 
+          borderRadius: '2px', 
+          fontSize: '9px', 
+          color: '#666' 
         }}
       >
         © OpenFreeMap © OpenStreetMap

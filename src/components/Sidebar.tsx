@@ -22,6 +22,8 @@ interface SidebarProps {
     underline: boolean;
     fontFamily: string;
     letterSpacing: number;
+    titleSize: number;
+    subtitleSize: number;
   };
   onLabelsChange: (labels: any) => void;
   onExport: (format: 'png' | 'jpeg' | 'pdf' | 'svg') => void;
@@ -380,6 +382,38 @@ export default function Sidebar({
               step="1"
               value={labels.letterSpacing}
               onChange={(e) => onLabelsChange({ ...labels, letterSpacing: parseInt(e.target.value) })}
+              className="w-full accent-black h-1 rounded-lg bg-slate-100 cursor-pointer"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 pt-2">
+            <div className="flex justify-between items-center">
+              <label style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Title Size</label>
+              <span style={{ fontSize: '10px', color: '#64748b' }}>{labels.titleSize}px</span>
+            </div>
+            <input 
+              type="range" 
+              min="12" 
+              max="120" 
+              step="1"
+              value={labels.titleSize}
+              onChange={(e) => onLabelsChange({ ...labels, titleSize: parseInt(e.target.value) })}
+              className="w-full accent-black h-1 rounded-lg bg-slate-100 cursor-pointer"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 pt-2">
+            <div className="flex justify-between items-center">
+              <label style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Subtitle Size</label>
+              <span style={{ fontSize: '10px', color: '#64748b' }}>{labels.subtitleSize}px</span>
+            </div>
+            <input 
+              type="range" 
+              min="8" 
+              max="60" 
+              step="1"
+              value={labels.subtitleSize}
+              onChange={(e) => onLabelsChange({ ...labels, subtitleSize: parseInt(e.target.value) })}
               className="w-full accent-black h-1 rounded-lg bg-slate-100 cursor-pointer"
             />
           </div>
