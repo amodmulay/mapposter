@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Theme } from '@/lib/mapStyle';
 import themes from '@/data/themes.json';
-import { Download, Palette, Type, Layout as LayoutIcon, Loader2 } from 'lucide-react';
+import { Download, Palette, Type, Layout as LayoutIcon, Loader2, Info } from 'lucide-react';
+import layouts from '@/data/layouts.json';
 
 interface SidebarProps {
   currentTheme: Theme;
@@ -26,7 +27,7 @@ interface SidebarProps {
     subtitleSize: number;
   };
   onLabelsChange: (labels: any) => void;
-  onExport: (format: 'png' | 'jpeg' | 'pdf' | 'svg') => void;
+  onExport: (format: 'png' | 'jpeg' | 'pdf') => void;
   currentResolution: string;
   onResolutionChange: (resId: string) => void;
   currentPadding: string;
@@ -68,6 +69,7 @@ const RESOLUTIONS = [
 ];
 
 const PADDINGS = [
+  { id: 'default', name: 'Default', desc: 'Layout default' },
   { id: 'none', name: 'None', desc: 'Edge to edge' },
   { id: 'small', name: 'Small', desc: 'Subtle border' },
   { id: 'medium', name: 'Medium', desc: 'Classic frame' },
@@ -92,7 +94,7 @@ export default function Sidebar({
   onPinIconChange
 }: SidebarProps) {
   const [exporting, setExporting] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'png' | 'jpeg' | 'pdf' | 'svg'>('png');
+  const [exportFormat, setExportFormat] = useState<'png' | 'jpeg' | 'pdf'>('png');
 
   const handleExportClick = async () => {
     setExporting(true);
@@ -172,20 +174,69 @@ export default function Sidebar({
         </div>
       </section>
 
-      {/* Padding Selector */}
+      {/* Layout Selector */}
       <section>
         <div className="flex items-center gap-2 mb-4 text-slate-400">
           <LayoutIcon className="w-3.5 h-3.5" />
-          <span className="text-xs font-bold uppercase tracking-wider">Padding</span>
+          <span className="text-xs font-bold uppercase tracking-wider">Layout</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem' }}>
+        <div className="flex flex-col gap-2">
+          {layouts.map((l: any) => (
+            <button
+              key={l.id}
+              onClick={() => onLayoutSelect(l)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.75rem 1rem',
+                borderRadius: '6px',
+                border: '1px solid',
+                borderColor: currentLayout.id === l.id ? '#000' : '#e5e7eb',
+                backgroundColor: currentLayout.id === l.id ? '#fcfcfc' : '#fff',
+                textAlign: 'left',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div>
+                <p className="text-black font-bold" style={{ fontSize: '12px' }}>{l.name}</p>
+                <p className="text-slate-400" style={{ fontSize: '10px' }}>{l.description}</p>
+              </div>
+              <div 
+                style={{ 
+                  width: '14px', 
+                  height: '14px', 
+                  borderRadius: '50%', 
+                  border: '2px solid',
+                  borderColor: currentLayout.id === l.id ? '#000' : '#d1d5db',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {currentLayout.id === l.id && <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#000' }} />}
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Padding Selector */}
+      <section>
+        <div className="flex items-center gap-2 mb-4 text-slate-400 cursor-help" title="Select 'Default' to use the Padding defined by the Layout above. Selecting any other option overrides the Layout's default padding.">
+          <LayoutIcon className="w-3.5 h-3.5" />
+          <span className="text-xs font-bold uppercase tracking-wider">Padding Override</span>
+          <Info className="w-3.5 h-3.5 text-slate-300" />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
           {PADDINGS.map((pad) => (
             <button
               key={pad.id}
               onClick={() => onPaddingChange(pad.id)}
+              title={pad.desc}
               style={{
                 padding: '0.5rem 0',
-                fontSize: '10px',
+                fontSize: '9px',
                 fontWeight: 'bold',
                 textTransform: 'uppercase',
                 borderRadius: '4px',
@@ -495,8 +546,8 @@ export default function Sidebar({
       {/* Export Section */}
       <div className="mt-auto" style={{ paddingTop: '1.5rem', borderTop: '1px solid #eeeeee' }}>
         <label style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '0.75rem', display: 'block' }}>Format</label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem', marginBottom: '1.25rem' }}>
-          {(['png', 'jpeg', 'pdf', 'svg'] as const).map((f) => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem', marginBottom: '1.25rem' }}>
+          {(['png', 'jpeg', 'pdf'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setExportFormat(f)}

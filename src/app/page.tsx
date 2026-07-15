@@ -32,7 +32,7 @@ export default function Home() {
     subtitleSize: 20
   });
   const [resolution, setResolution] = useState('a4');
-  const [padding, setPadding] = useState('none');
+  const [padding, setPadding] = useState('default');
   const [pinColor, setPinColor] = useState('#ef4444');
   const [pinIcon, setPinIcon] = useState<'pin' | 'heart' | 'home'>('pin');
 
@@ -91,11 +91,17 @@ export default function Home() {
     });
   };
 
-  const handleExport = async (format: 'png' | 'jpeg' | 'pdf' | 'svg') => {
+  const handleExport = async (format: 'png' | 'jpeg' | 'pdf') => {
     if (!mapRef.current) return;
     
     const dims = resolutionDimensions[resolution];
-    const padPx = Math.round(dims.width * paddingValues[padding]);
+    
+    let padPx = 0;
+    if (padding === 'default') {
+       padPx = parseInt(layout.styles.padding.replace('px', '')) * (dims.width / 2400);
+    } else {
+       padPx = Math.round(dims.width * paddingValues[padding]);
+    }
 
     try {
       await exportPoster(mapRef.current, {
@@ -104,6 +110,7 @@ export default function Home() {
         subtitle: labels.subtitle,
         center,
         theme,
+        layout,
         width: dims.width,
         height: dims.height,
         showPin: labels.showPin,
@@ -128,7 +135,15 @@ export default function Home() {
 
   const dims = resolutionDimensions[resolution];
   const exportScale = dims.width / 2400;
-  const previewPadPx = `${dims.width * paddingValues[padding]}px`;
+  
+  let previewPadPx = '0px';
+  if (padding === 'default') {
+     previewPadPx = `${parseInt(layout.styles.padding.replace('px', '')) * exportScale}px`;
+  } else {
+     previewPadPx = `${dims.width * paddingValues[padding]}px`;
+  }
+  
+  const borderWidthPx = parseInt(layout.styles.borderWidth.replace('px', '')) * exportScale;
 
   const textStyle: React.CSSProperties = {
     fontStyle: labels.italic ? 'italic' : 'normal',
@@ -186,10 +201,13 @@ export default function Home() {
               transformOrigin: 'center center',
               flexShrink: 0,
               maxWidth: 'none',
-              animation: 'none' // Disable zoom animation to prevent flickering with scaling logic
+              animation: 'none', // Disable zoom animation to prevent flickering with scaling logic
+              border: borderWidthPx > 0 ? `${borderWidthPx}px solid ${labels.titleColor}` : 'none',
+              boxSizing: 'border-box',
+              position: 'relative'
             }}
           >
-            <div className="map-viewport" style={{ flex: 3, marginBottom: 0 }}>
+            <div className="map-viewport" style={{ flex: layout.styles.labelPosition === 'overlay' ? 1 : 3, marginBottom: 0, position: 'relative' }}>
                <Map 
                  center={center} 
                  zoom={zoom} 
@@ -203,17 +221,31 @@ export default function Home() {
                    setZoom(z);
                  }}
                />
+               
+               {layout.styles.labelPosition === 'overlay' && (
+                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent pt-32 pb-12 flex flex-col items-center justify-end" style={{ zIndex: 10, pointerEvents: 'none' }}>
+                    <h1 style={{ fontSize: `${labels.titleSize * exportScale}px`, fontWeight: 'bold', marginBottom: `${10 * exportScale}px`, color: '#ffffff', ...textStyle, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{labels.title}</h1>
+                    <p style={{ fontSize: `${labels.subtitleSize * exportScale}px`, color: '#f8fafc', marginBottom: `${10 * exportScale}px`, ...textStyle, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{labels.subtitle}</p>
+                    {labels.showCoordinates && (
+                      <p style={{ fontSize: `${12 * exportScale}px`, fontFamily: 'monospace', color: '#e2e8f0', ...textStyle, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                        {center[1].toFixed(4)}° N / {center[0].toFixed(4)}° E
+                      </p>
+                    )}
+                 </div>
+               )}
             </div>
             
-            <div className="text-center" style={{ fontFamily: 'serif', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h1 style={{ fontSize: `${labels.titleSize * exportScale}px`, fontWeight: 'bold', marginBottom: `${10 * exportScale}px`, color: labels.titleColor, ...textStyle, transform: `translateY(${-labels.titleSize * 0.9 * exportScale}px)` }}>{labels.title}</h1>
-              <p style={{ fontSize: `${labels.subtitleSize * exportScale}px`, color: labels.subtitleColor, marginBottom: `${10 * exportScale}px`, ...textStyle, transform: `translateY(${15 * exportScale}px)` }}>{labels.subtitle}</p>
-              {labels.showCoordinates && (
-                <p style={{ fontSize: `${12 * exportScale}px`, fontFamily: 'monospace', color: labels.coordsColor, ...textStyle, transform: `translateY(${60 * exportScale}px)` }}>
-                  {center[1].toFixed(4)}° N / {center[0].toFixed(4)}° E
-                </p>
-              )}
-            </div>
+            {layout.styles.labelPosition === 'bottom' && (
+              <div className="text-center" style={{ fontFamily: 'serif', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <h1 style={{ fontSize: `${labels.titleSize * exportScale}px`, fontWeight: 'bold', marginBottom: `${10 * exportScale}px`, color: labels.titleColor, ...textStyle, transform: `translateY(${-labels.titleSize * 0.9 * exportScale}px)` }}>{labels.title}</h1>
+                <p style={{ fontSize: `${labels.subtitleSize * exportScale}px`, color: labels.subtitleColor, marginBottom: `${10 * exportScale}px`, ...textStyle, transform: `translateY(${15 * exportScale}px)` }}>{labels.subtitle}</p>
+                {labels.showCoordinates && (
+                  <p style={{ fontSize: `${12 * exportScale}px`, fontFamily: 'monospace', color: labels.coordsColor, ...textStyle, transform: `translateY(${60 * exportScale}px)` }}>
+                    {center[1].toFixed(4)}° N / {center[0].toFixed(4)}° E
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>

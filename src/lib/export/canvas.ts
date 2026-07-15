@@ -2,11 +2,12 @@ import { jsPDF } from 'jspdf';
 import maplibregl from 'maplibre-gl';
 
 export interface ExportOptions {
-  format: 'png' | 'jpeg' | 'pdf' | 'svg';
+  format: 'png' | 'jpeg' | 'pdf';
   title: string;
   subtitle: string;
   center: [number, number];
   theme: any;
+  layout: any;
   width: number;
   height: number;
   showPin?: boolean;
@@ -131,7 +132,7 @@ function fillTextStyled(
 
 export async function exportPoster(map: maplibregl.Map, options: ExportOptions) {
   const { 
-    format, title, subtitle, center, theme, 
+    format, title, subtitle, center, theme, layout,
     width: targetWidth, height: targetHeight, 
     showPin = true, padding = 0, 
     pinColor = '#ef4444', pinIcon = 'pin',
@@ -146,10 +147,11 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   const contentWidth = targetWidth - (padding * 2);
   const contentHeight = targetHeight - (padding * 2);
 
-  // Label area takes exactly 1/4 of the content height
-  const labelAreaHeight = contentHeight * 0.25;
+  // Layout processing
+  const isOverlay = layout.styles.labelPosition === 'overlay';
+  const labelAreaHeight = isOverlay ? 0 : contentHeight * 0.25;
   const mapWidth = contentWidth;
-  const mapHeight = contentHeight * 0.75;
+  const mapHeight = contentHeight - labelAreaHeight;
   
   const baseWidth = 1200;
   const baseHeight = Math.round(baseWidth * (mapHeight / mapWidth));
@@ -197,6 +199,25 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   // 2. Draw Map (centered within padding)
   ctx.drawImage(glCanvas, padding, padding, mapWidth, mapHeight);
 
+  // 2.5 Draw Border if present
+  const borderWidthStr = layout.styles.borderWidth || '0px';
+  const rawBorderWidth = parseInt(borderWidthStr.replace('px', ''));
+  if (rawBorderWidth > 0) {
+    const scale = targetWidth / 2400;
+    const scaledBorderWidth = rawBorderWidth * scale;
+    ctx.strokeStyle = titleColor || '#0f172a'; // Using titleColor as a safe fallback for border color based on UI logic
+    ctx.lineWidth = scaledBorderWidth;
+    
+    // Draw border precisely inside the padded area
+    // offset by half lineWidth so the stroke stays perfectly within the target bounds
+    ctx.strokeRect(
+      padding + (scaledBorderWidth / 2),
+      padding + (scaledBorderWidth / 2),
+      contentWidth - scaledBorderWidth,
+      contentHeight - scaledBorderWidth
+    );
+  }
+
   // 3. Draw Pin (Manual Projection)
   if (showPin) {
     const point = offscreenMap.project(center);
@@ -217,13 +238,28 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
   ctx.textBaseline = 'middle';
 
   const centerX = tempCanvas.width / 2;
-  // The center of the label area is exactly halfway between the map's bottom and the canvas's padding edge
-  const labelSectionCenterY = padding + mapHeight + (labelAreaHeight / 2);
-  const fontStyle = italic ? 'italic ' : '';
+  
+  // The center of the label area
+  let labelSectionCenterY = padding + mapHeight + (labelAreaHeight / 2);
   
   // Font Family mapping
   const fontName = fontFamily === 'serif' ? 'serif' : fontFamily;
+  const fontStyle = italic ? 'italic ' : '';
   
+  // Draw Overlay shadow box if necessary
+  if (isOverlay) {
+     const gradientHeight = targetHeight * 0.25; // bottom 25% gradient
+     const gradient = ctx.createLinearGradient(0, targetHeight - gradientHeight, 0, targetHeight);
+     gradient.addColorStop(0, 'rgba(0,0,0,0)');
+     gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
+     
+     ctx.fillStyle = gradient;
+     ctx.fillRect(0, targetHeight - gradientHeight, targetWidth, gradientHeight);
+     
+     // Redefine center Y specifically targeting the lower portion of the overlay
+     labelSectionCenterY = targetHeight - (targetHeight * 0.08); 
+  }
+
   // Apply letter spacing (modern browsers)
   if ('letterSpacing' in ctx) {
     (ctx as any).letterSpacing = `${letterSpacing * scale}px`;
@@ -231,19 +267,19 @@ export async function exportPoster(map: maplibregl.Map, options: ExportOptions) 
 
   // Title (drawn slightly above center)
   const finalTitleSize = Math.round(titleSize * scale);
-  ctx.fillStyle = titleColor;
+  ctx.fillStyle = isOverlay ? '#ffffff' : titleColor;
   ctx.font = `${fontStyle}bold ${finalTitleSize}px "${fontName}"`;
   fillTextStyled(ctx, title.toUpperCase(), centerX, labelSectionCenterY - (Math.round(45 * scale)), underline, finalTitleSize);
 
   // Subtitle (drawn slightly below center)
   const finalSubtitleSize = Math.round(subtitleSize * scale);
-  ctx.fillStyle = subtitleColor;
+  ctx.fillStyle = isOverlay ? '#f8fafc' : subtitleColor;
   ctx.font = `${fontStyle}${finalSubtitleSize}px "${fontName}"`;
   fillTextStyled(ctx, subtitle.toUpperCase(), centerX, labelSectionCenterY + (Math.round(15 * scale)), underline, finalSubtitleSize);
 
   // Coordinates (drawn below subtitle)
   const coordsSize = Math.round(12 * scale);
-  ctx.fillStyle = coordsColor;
+  ctx.fillStyle = isOverlay ? '#e2e8f0' : coordsColor;
   const coordsFont = fontFamily === 'serif' ? 'monospace' : `"${fontName}"`;
   ctx.font = `${fontStyle}${coordsSize}px ${coordsFont}`;
   const coords = `${center[1].toFixed(4)}° N / ${center[0].toFixed(4)}° E`;
