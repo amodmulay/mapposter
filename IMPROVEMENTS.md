@@ -50,6 +50,26 @@ This file is the working guide for iterative improvement of the project and the 
 - Target files: package.json, src/lib/mapStyle.ts, test files
 - Success: dependency list is minimal and critical flows are test-covered.
 
+9. [TODO] Fix layout and overlay preview rendering
+- Problem: overlay layout positioning and gradient rely on utility classes that are not defined or imported, so labels may not overlay the map as intended.
+- Target files: src/app/page.tsx, src/app/globals.css
+- Success: every layout preset renders its labels and map in the intended positions across supported preview sizes.
+
+10. [TODO] Match PDF page dimensions to print presets
+- Problem: pixel dimensions are passed to jsPDF with pixel units, producing pages that do not match the selected physical paper size.
+- Target files: src/app/page.tsx, src/lib/export/canvas.ts
+- Success: exported PDFs use the correct physical dimensions for A4, A3, and square presets.
+
+11. [TODO] Keep preview and exported poster consistent
+- Problem: preview and export differ in label casing and map border/shadow decoration, and coordinate directions are always shown as north/east.
+- Target files: src/app/page.tsx, src/components/Map.tsx, src/lib/export/canvas.ts
+- Success: preview and exported image/PDF match for label text and map framing, and coordinates use correct hemisphere directions.
+
+12. [TODO] Add print-focused preview confirmation
+- Problem: users can edit a scaled poster preview and export, but cannot separately verify physical page dimensions and print margins before downloading.
+- Target files: src/app/page.tsx, src/components/Sidebar.tsx, src/app/globals.css
+- Success: users can inspect the selected print size and margins in a clear print-preview state before export.
+
 ## Change Log
 
 ## 2026-06-14
